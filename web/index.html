@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Regression Research Showcase | Reproducing Classic ML Studies</title>
+    
+    <!-- SEO Optimization -->
+    <meta name="description" content="An interactive ML showcase reproducing findings from classic studies (Medical Insurance costs & 1978 Boston Housing Hedonic Pricing) using from-scratch vectorized linear regression with animated gradient descent convergence.">
+    <meta name="keywords" content="Machine Learning, Linear Regression, Gradient Descent, Andrew Ng, Interactive Web Showcase, Data Science Portfolio">
+    <meta name="author" content="ML Engineer">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <!-- Animated Grid Overlay -->
+    <div class="grid-background"></div>
+    <div class="radial-glow"></div>
+
+    <!-- Navigation Header -->
+    <header class="app-header">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="logo-symbol">θ</span>
+                <span class="logo-text">LR.Showcase</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#playground" class="nav-link">Playground</a>
+                <a href="#insurance" class="nav-link">Insurance Study</a>
+                <a href="#boston" class="nav-link">Boston Housing</a>
+                <a href="#ethical" class="nav-link">Ethics & Bias</a>
+                <a href="#math" class="nav-link">The Math</a>
+            </nav>
+            <a href="https://github.com" target="_blank" class="github-btn" id="github-link">
+                <span>View Notebook</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge"> Andrew Ng ML Specialization Reproduction</div>
+            <h1 class="hero-title">Reproducing Classic Research with <br><span class="gradient-text">Linear Regression</span></h1>
+            <p class="hero-subtitle">
+                An interactive web-based showcase and from-scratch vectorized model engine implementing key machine learning theories to replicate socioeconomic and insurance cost findings.
+            </p>
+            <div class="hero-cta-group">
+                <a href="#playground" class="btn primary-btn">Launch GD Sandbox</a>
+                <a href="#insurance" class="btn secondary-btn">See Key Findings</a>
+            </div>
+        </section>
+
+        <!-- Dynamic Metrics Grid -->
+        <section class="global-stats-grid">
+            <div class="stat-card glass-card">
+                <div class="stat-value" id="stat-engine">Vectorized</div>
+                <div class="stat-label">Linear Regression Engine</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-value" id="stat-ins-r2">74.7%</div>
+                <div class="stat-label">Insurance R² Accuracy</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-value" id="stat-bos-r2">74.1%</div>
+                <div class="stat-label">Boston Housing R² Accuracy</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-value" id="stat-tolerance">10<sup>-4</sup></div>
+                <div class="stat-label">Scikit-Learn Convergence Match</div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: INTERACTIVE GRADIENT DESCENT PLAYGROUND -->
+        <section id="playground" class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">1. Gradient Descent Sandbox</h2>
+                <p class="section-desc">
+                    Plot custom coordinates on the interactive matrix grid and run gradient descent. Watch how the fitting line converges and traces its path down the cost surface in real time.
+                </p>
+            </div>
+
+            <div class="playground-layout">
+                <!-- Sandbox Canvas Card -->
+                <div class="canvas-card glass-card">
+                    <div class="card-header">
+                        <span class="card-tag">Interactive Grid</span>
+                        <h3 class="card-title">Training Coordinate Plane</h3>
+                    </div>
+                    <div class="canvas-wrapper">
+                        <canvas id="sandbox-canvas" width="600" height="400"></canvas>
+                        <div class="canvas-instructions">Click grid to add coordinates. Drag to reposition. Right-click to remove.</div>
+                    </div>
+                    
+                    <!-- Sandbox Controls -->
+                    <div class="sandbox-controls">
+                        <div class="control-row">
+                            <button id="btn-play-gd" class="play-btn">
+                                <span class="btn-icon">▶</span> <span class="btn-text">Play GD</span>
+                            </button>
+                            <button id="btn-step-gd" class="control-btn">Step</button>
+                            <button id="btn-reset-gd" class="control-btn danger-btn">Reset Parameters</button>
+                            <button id="btn-clear-points" class="control-btn">Clear Points</button>
+                        </div>
+                        <div class="control-row">
+                            <button id="btn-gen-linear" class="preset-btn">Generate Linear Pattern</button>
+                            <button id="btn-gen-outliers" class="preset-btn">Linear with Outliers</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parameters Dashboard Card -->
+                <div class="controls-card glass-card">
+                    <div class="card-header">
+                        <span class="card-tag">Model Settings</span>
+                        <h3 class="card-title">Hyperparameter Controls</h3>
+                    </div>
+                    
+                    <div class="hyperparameter-sliders">
+                        <!-- GD Mode -->
+                        <div class="slider-group">
+                            <label class="slider-label-row">
+                                <span>Optimization Mode</span>
+                                <span id="val-gd-mode" class="slider-val-tag">Batch GD</span>
+                            </label>
+                            <select id="select-gd-mode" class="modern-select">
+                                <option value="batch">Batch Gradient Descent</option>
+                                <option value="stochastic">Stochastic Gradient Descent (SGD)</option>
+                                <option value="minibatch">Mini-Batch (Size: 4)</option>
+                            </select>
+                        </div>
+
+                        <!-- Learning Rate Slider -->
+                        <div class="slider-group">
+                            <label class="slider-label-row">
+                                <span>Learning Rate (&alpha;)</span>
+                                <span id="val-lr" class="slider-val-tag">0.05</span>
+                            </label>
+                            <input type="range" id="slider-lr" min="0.001" max="0.3" step="0.001" value="0.05" class="modern-slider">
+                            <div class="slider-presets">
+                                <span class="preset-pill" data-lr="0.001">0.001 (Slow)</span>
+                                <span class="preset-pill active" data-lr="0.05">0.05 (Ideal)</span>
+                                <span class="preset-pill" data-lr="0.25">0.25 (Overshoot)</span>
+                            </div>
+                        </div>
+
+                        <!-- Iteration Speed Slider -->
+                        <div class="slider-group">
+                            <label class="slider-label-row">
+                                <span>Simulation Speed</span>
+                                <span id="val-speed" class="slider-val-tag">60 FPS</span>
+                            </label>
+                            <input type="range" id="slider-speed" min="1" max="120" step="1" value="60" class="modern-slider">
+                        </div>
+                    </div>
+
+                    <!-- Metrics Real-Time Display -->
+                    <div class="live-metrics-box">
+                        <h4 class="metrics-box-title">Model State Metrics</h4>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-val" id="live-epoch">0</div>
+                                <div class="metric-lbl">Epoch Counter</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-val" id="live-loss">0.0000</div>
+                                <div class="metric-lbl">Loss Value (MSE)</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-val" id="live-slope">0.0000</div>
+                                <div class="metric-lbl">Weight Slope (w)</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-val" id="live-intercept">0.0000</div>
+                                <div class="metric-lbl">Bias Intercept (b)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cost Contours and Trajectory -->
+                    <div class="contour-box">
+                        <h4 class="metrics-box-title">Parameter Space Convergence Path</h4>
+                        <div class="contour-canvas-container">
+                            <canvas id="contour-canvas" width="300" height="150"></canvas>
+                        </div>
+                        <div class="contour-footer">Tracing parameters trajectory on MSE landscape</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: INSURANCE COST PREDICTION -->
+        <section id="insurance" class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">2. Medical Insurance Cost Prediction</h2>
+                <p class="section-desc">
+                    Replicating insurance cost predictions based on 1,338 records. This study showcases the predictive limits of single continuous variables (Age, BMI) and demonstrates the remarkable variance shift when adding high-leverage categorical predictors like Smoking status.
+                </p>
+            </div>
+
+            <!-- Tab Switching Layout -->
+            <div class="comparison-layout">
+                <div class="tab-controls-card glass-card">
+                    <h3 class="panel-subtitle">Select Prediction Dimension</h3>
+                    <div class="tab-list">
+                        <button class="tab-btn active" data-tab="tab-ins-age">
+                            <div class="tab-btn-title">Univariate Model: Age</div>
+                            <div class="tab-btn-desc">Positive drift (~$257/year increase)</div>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-ins-bmi">
+                            <div class="tab-btn-title">Univariate Model: BMI</div>
+                            <div class="tab-btn-desc">Weak overall cost prediction alone</div>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-ins-smoker">
+                            <div class="tab-btn-title">Multivariate: Smoking Status</div>
+                            <div class="tab-btn-desc">The primary driver of high charges</div>
+                        </button>
+                    </div>
+
+                    <div class="study-insight-box">
+                        <h4 class="insight-box-title">Statistical Summary</h4>
+                        <p id="ins-insight-text">
+                            Age displays a solid, highly distinct linear banding structure. The custom OLS regression line shows a cost increment of roughly $257 for every year of age. However, univariate accuracy remains limited (R² = 0.089) due to multiple underlying population tiers.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Display Charts Card -->
+                <div class="chart-display-card glass-card">
+                    <div id="tab-ins-age" class="tab-content active">
+                        <div class="chart-header">
+                            <h3 class="card-title">Age vs. Medical Charges Regression</h3>
+                            <span class="card-tag r2-tag">R² = 0.0894</span>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-insurance-age"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="tab-ins-bmi" class="tab-content">
+                        <div class="chart-header">
+                            <h3 class="card-title">Body Mass Index (BMI) vs. Charges</h3>
+                            <span class="card-tag r2-tag">R² = 0.0393</span>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-insurance-bmi"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="tab-ins-smoker" class="tab-content">
+                        <div class="chart-header">
+                            <h3 class="card-title">R² Shift: The Power of Smoker Categorization</h3>
+                            <span class="card-tag r2-tag max-r2">R² = 0.7475</span>
+                        </div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-insurance-evolution"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: BOSTON HOUSING CLEAN AIR DEMAND -->
+        <section id="boston" class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">3. Replicating Harrison & Rubinfeld (1978)</h2>
+                <p class="section-desc">
+                    Replicating the famous 1978 hedonic housing model to calculate environmental willingness-to-pay for clean air. The paper estimated pricing structures based on nitric oxides concentration (NOx), proximity to employment centers, crime, and education indexes.
+                </p>
+            </div>
+
+            <div class="boston-grid">
+                <!-- NOx vs MEDV scatter -->
+                <div class="boston-chart-card glass-card">
+                    <div class="chart-header">
+                        <h3 class="card-title">Nitric Oxide Pollution (NOx) vs. Price</h3>
+                        <span class="card-tag">R² = 0.1826</span>
+                    </div>
+                    <p class="card-subtitle">Showing median value of owner-occupied homes ($1000s) as air pollution escalates.</p>
+                    <div class="chart-canvas-wrapper large-wrapper">
+                        <canvas id="chart-boston-nox"></canvas>
+                    </div>
+                </div>
+
+                <!-- Feature Importance card -->
+                <div class="boston-chart-card glass-card">
+                    <div class="chart-header">
+                        <h3 class="card-title">Boston Housing Feature Importance</h3>
+                        <span class="card-tag model-tag">Full OLS Model: R² = 0.7406</span>
+                    </div>
+                    <p class="card-subtitle">Standardized feature coefficients. Green bars indicate positive influence, red bars represent negative impact.</p>
+                    <div class="chart-canvas-wrapper large-wrapper">
+                        <canvas id="chart-boston-importance"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ETHICS & BIAS DEEP DIVE -->
+        <section id="ethical" class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">4. Ethics & Socioeconomic Bias in ML</h2>
+                <p class="section-desc">
+                    Unveiling historical racial inequalities embedded in public baseline datasets.
+                </p>
+            </div>
+
+            <div class="ethics-box glass-card">
+                <div class="ethics-decor">⚠️</div>
+                <div class="ethics-body">
+                    <h3 class="ethics-headline">Redlining and the Demise of the Boston 'B' Variable</h3>
+                    <p>
+                        In their landmark 1978 paper, Harrison & Rubinfeld included a demographic variable designated as <strong>B</strong>, defined mathematically as:
+                    </p>
+                    <div class="formula-block-styled">
+                        B = 1000 &bull; (B<sub>k</sub> - 0.63)<sup>2</sup>
+                    </div>
+                    <p>
+                        Where <strong>B<sub>k</sub></strong> represents the proportion of Black residents in a given neighborhood block. This metric heavily penalized communities with moderate integration, mathematical modeling that directly quantified and justified racial redlining policies and systemic mortgage disparities of the era.
+                    </p>
+                    <p>
+                        <strong>Our Ethical Stance:</strong> While we successfully reproduced this historic model to demonstrate the mathematical mechanics of multivariate Ordinary Least Squares (OLS), we explicitly acknowledge this bias. In modern production environments, engineers should seek cleaner demographic-free frameworks like the <strong>Ames Housing Dataset</strong> to eliminate the propagation of structural historic inequities.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: MATHEMATICAL BREAKDOWN -->
+        <section id="math" class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">5. Mathematics & Formulas</h2>
+                <p class="section-desc">
+                    Revisiting the optimization landscape of linear models from Andrew Ng's Machine Learning Specialization.
+                </p>
+            </div>
+
+            <div class="math-grid">
+                <div class="math-card glass-card">
+                    <h3 class="math-title">Mean Squared Error Cost</h3>
+                    <div class="formula-block">
+                        J(w, b) = <span class="frac"><span>1</span><span class="bottom">2m</span></span> &sum; <span class="sup">( f<sub>w,b</sub>(x<sup>(i)</sup>) - y<sup>(i)</sup> )<sup>2</sup></span>
+                    </div>
+                    <p class="math-desc">Calculates the mean squared error variance across all training instances. In our vectorized engine, this operates as a dot-product transposal for computational acceleration.</p>
+                </div>
+
+                <div class="math-card glass-card">
+                    <h3 class="math-title">Vectorized Parameter Gradient</h3>
+                    <div class="formula-block">
+                        &part;J/&part;w = <span class="frac"><span>1</span><span class="bottom">m</span></span> X<sup>T</sup> (Xw + b1 - y)
+                    </div>
+                    <p class="math-desc">Computes the exact derivative slope of the error surface. Passing the transposed matrix enables updating all feature weights simultaneously without iterative scalar looping.</p>
+                </div>
+
+                <div class="math-card glass-card">
+                    <h3 class="math-title">Gradient Descent Updates</h3>
+                    <div class="formula-block">
+                        w &larr; w - &alpha; &bull; &part;J/&part;w
+                    </div>
+                    <p class="math-desc">Steps features weights against the direction of error slope. Tuning the learning rate (&alpha;) controls the step convergence duration without causing weight oscillation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LinkedIn CTA / Bio Section -->
+        <section class="bio-section glass-card">
+            <div class="bio-left">
+                <h2 class="bio-title">Reproduce & Connect on LinkedIn</h2>
+                <p class="bio-text">
+                    This project proves that the foundational models powering modern deep neural networks can be understood, developed, and calibrated using raw linear algebra. If you found this interactive reproduction helpful, let's connect on LinkedIn to discuss machine learning systems design and research validation!
+                </p>
+                <div class="bio-cta-group">
+                    <a href="https://linkedin.com" target="_blank" class="btn primary-btn" id="linkedin-btn">Connect on LinkedIn</a>
+                    <a href="#playground" class="btn secondary-btn">Try Sandbox Again</a>
+                </div>
+            </div>
+            <div class="bio-right">
+                <div class="code-terminal">
+                    <div class="terminal-bar">
+                        <span class="term-dot"></span>
+                        <span class="term-dot"></span>
+                        <span class="term-dot"></span>
+                        <span class="term-title">engine_test.py</span>
+                    </div>
+                    <pre class="terminal-content"><code><span class="c-keyword">import</span> numpy <span class="c-keyword">as</span> np
+<span class="c-keyword">from</span> engine <span class="c-keyword">import</span> LRScratch
+
+<span class="c-comment"># Build custom regressor</span>
+model = LRScratch(lr=<span class="c-number">0.05</span>, epochs=<span class="c-number">1000</span>)
+model.fit(X_train, y_train)
+
+<span class="c-comment"># Convergence Match vs Sklearn</span>
+assert np.allclose(model.w, sk_w, atol=<span class="c-number">1e-4</span>)
+print(<span class="c-string">"✓ Standard coefficients matched!"</span>)</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Linear Regression Showcase. Built using Vanilla CSS and JavaScript from first principles.</p>
+            <p>Inspired by Andrew Ng's Machine Learning Specialization. Sourced datasets: Kaggle & Harrison & Rubinfeld (1978).</p>
+        </div>
+    </footer>
+
+    <script src="index.js"></script>
+</body>
+</html>
