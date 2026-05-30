@@ -527,9 +527,30 @@ function initGDSandbox() {
 
     const updateDisplayMetrics = () => {
         lblEpoch.textContent = epoch;
-        lblLoss.textContent = computeMSE(w, b).toFixed(4);
+        
+        let loss = computeMSE(w, b);
+        
+        // Divergence Check (Learning Rate is too high)
+        if (isNaN(loss) || !isFinite(loss) || loss > 100000 || isNaN(w) || !isFinite(w) || isNaN(b) || !isFinite(b)) {
+            if (gdPlaying) {
+                togglePlayState();
+            }
+            lblLoss.innerHTML = `<span style="color: var(--accent-red); font-weight: bold; text-shadow: 0 0 6px rgba(239,68,68,0.3)">Diverged</span>`;
+            lblSlope.textContent = "Over limit";
+            lblIntercept.textContent = "Over limit";
+            document.querySelector('.canvas-instructions').innerHTML = `<span style="color: var(--accent-red); font-weight: bold;">Warning: Model diverged! Learning rate (&alpha;) is too high. Reset parameters.</span>`;
+            return;
+        }
+        
+        lblLoss.textContent = loss.toFixed(4);
         lblSlope.textContent = w.toFixed(4);
         lblIntercept.textContent = b.toFixed(4);
+        
+        // Reset instructions if healthy
+        if (points.length > 0) {
+            document.querySelector('.canvas-instructions').textContent = "Click grid to add coordinates. Drag to reposition. Right-click to remove.";
+        }
+        
         drawContourValley();
     };
 
@@ -576,19 +597,21 @@ function initGDSandbox() {
         }
 
         // 3. Draw gradient descent convergence line (Purple Solid Glow)
-        ctx.strokeStyle = 'rgba(162, 89, 255, 1)';
-        ctx.lineWidth = 4;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = 'rgba(162, 89, 255, 0.5)';
-        ctx.beginPath();
-        let startY = w * 0 + b;
-        let endY = w * 10 + b;
-        let screenStart = mathToScreen(0, startY);
-        let screenEnd = mathToScreen(10, endY);
-        ctx.moveTo(screenStart.x, screenStart.y);
-        ctx.lineTo(screenEnd.x, screenEnd.y);
-        ctx.stroke();
-        ctx.shadowBlur = 0; // Reset glow
+        if (!isNaN(w) && isFinite(w) && !isNaN(b) && isFinite(b) && Math.abs(w) < 100000 && Math.abs(b) < 100000) {
+            ctx.strokeStyle = 'rgba(162, 89, 255, 1)';
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(162, 89, 255, 0.5)';
+            ctx.beginPath();
+            let startY = w * 0 + b;
+            let endY = w * 10 + b;
+            let screenStart = mathToScreen(0, startY);
+            let screenEnd = mathToScreen(10, endY);
+            ctx.moveTo(screenStart.x, screenStart.y);
+            ctx.lineTo(screenEnd.x, screenEnd.y);
+            ctx.stroke();
+            ctx.shadowBlur = 0; // Reset glow
+        }
 
         // 4. Draw Coordinates Points
         ctx.fillStyle = 'rgba(0, 240, 255, 1)';
