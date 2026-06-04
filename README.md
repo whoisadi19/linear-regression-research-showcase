@@ -103,9 +103,5 @@ npx live-server web
 
 ---
 
-## 6. Connect on LinkedIn
-This project demonstrates that standard linear algebra holds the answers to understanding complex optimizer paths in deep neural networks. Let's connect to discuss systems design, statistics, and machine learning research.
-
-[Your LinkedIn Profile Link]
 
 This repository is archived. Future updates and active development have been consolidated into ml-papers-concepts.
